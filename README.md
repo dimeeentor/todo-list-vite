@@ -1,4 +1,6 @@
 # todo-list-vite
+<img width="1624" alt="Screenshot 2023-08-12 at 01 34 43" src="https://github.com/dimeeentor/todo-list-vite/assets/32683179/02b702f2-5ba0-4bd4-bdd1-59bac0c5ed8d">
+
 Front-end: React &amp; Vite. 
 Back-end: Node.js Express
 DB: MongoDB
