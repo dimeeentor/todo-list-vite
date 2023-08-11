@@ -1,0 +1,157 @@
+:root {
+  --box-shadow-lg: #939393 0px 0px 3px;
+  --box-shadow-sm: #939393 0px 0px 1.5px;
+  --warm-black: #241f19;
+  --font-size-md: clamp(14px, 3vw, 16px);
+  --font-size-sm: clamp(12px, 2vw, 16px);
+}
+
+body {
+  color: var(--warm-black);
+  font-size: var(--font-size-md);
+  overflow: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+button {
+  font-size: var(--font-size-sm);
+  color: inherit;
+  border: 1px solid #919191;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: .3s ease;
+  -webkit-transition: .3s ease;
+}
+
+.todo-window {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 50dvh;
+  min-height: 30ch;
+  width: 50dvw;
+  min-width: 35ch;
+  margin-inline: auto;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow-lg);
+  background-color: #fff;
+}
+
+.input-section {
+  display: flex;
+  width: 80%;
+  height: 34px;
+  font-size: 15px;
+  position: relative;
+
+  .input-task {
+    position: absolute;
+    z-index: 2;
+    height: 20px;
+    width: calc(100% - 16px);
+    font-size: var(--font-size-md);
+    color: inherit;
+    border: 1px solid #919191;
+    border-radius: 6px;
+    padding: 6px 7px;
+    transition: .3s ease .15s;
+    -webkit-transition: .3s ease .15s;
+
+    &:focus {
+      outline: none;
+      box-shadow: var(--box-shadow-sm);
+      width: 70%;
+    }
+  }
+
+  .done-btn {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    width: 20%;
+    height: inherit;
+    transition-delay: ease .2s;
+    -webkit-transition-delay: .3s ease;
+
+    &:hover {
+      scale: 1.05;
+    }
+  }
+}
+
+.tasks {
+  width: 100%;
+  height: inherit;
+  overflow: scroll;
+  margin-top: 10px;
+
+  .task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(80% - 20px);
+    height: 32px;
+    margin-inline: auto;
+    font-size: var(--font-size-md);
+    color: var(--warm-black);
+    background-color: #fff;
+    box-shadow: var(--box-shadow-sm);
+    border-radius: 6px;
+    padding: 2.5px 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    transition: .3s ease;
+    -webkit-transition: .3s ease;
+
+    .input-edit {
+      position: relative;
+      left: -10px;
+      padding-inline: 10px;
+      border: none;
+      border-radius: 6px 0 0 6px;
+      height: 33px;
+      width: calc(50% - 10px);
+      font-size: var(--font-size-md);
+      color: var(--warm-black);
+
+      &:focus {
+        outline: 1px dashed #313131;
+      }
+    }
+
+    .removeTask-btn {
+      height: 17px;
+      width: 17px;
+      border: 1px dashed var(--warm-black);
+      border-radius: 100%;
+      background-color: #fff;
+      cursor: pointer;
+      transition: .3s ease;
+      -webkit-transition: .3s ease;
+
+      &:hover {
+        outline: none;
+        background-color: #313131;
+      }
+    }
+
+    .task-control {
+      display: flex;
+      align-items: inherit;
+
+      .edit-btn {
+        background-color: #fff;
+        font-size: 14px;
+        margin-right: 10px;
+
+        &:hover {
+          box-shadow: var(--box-shadow-sm);
+        }
+      }
+    }
+  }
+}
