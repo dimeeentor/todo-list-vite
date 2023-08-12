@@ -1,0 +1,16 @@
+.error {
+  position: absolute;
+  bottom: 15px;
+  padding: 6px 12px;
+  border: 1px solid #313131;
+  border-radius: 6px;
+  color: #313131;
+}
+
+@media (prefers-color-scheme: dark) {
+  .error {
+    border: 1px solid #939393;
+    color: white;
+    background-color: #131313;
+  }
+}

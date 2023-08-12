@@ -1,6 +1,6 @@
 import axios from "axios"
 import { TaskProps } from "../../App"
-import styles from "../../styles/App.module.css"
+import styles from "./styles.module.css"
 import { FC, KeyboardEvent, useCallback, useRef, useState } from "react"
 
 const TaskElement: FC<TaskProps> = ({

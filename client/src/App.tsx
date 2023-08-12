@@ -1,25 +1,52 @@
 import { v4 } from "uuid"
-import { Task } from "./types/task"
+import { Task } from "./types/Task"
 import TaskElement from "./components/Task"
 import styles from "./styles/App.module.css"
 import axios, { AxiosRequestConfig } from "axios"
 import { useState, useRef, useCallback, useEffect } from "react"
+import ErrorBlock from "./components/ErrorBlock"
 
 export type TaskProps = {
     task: Task
     doRemoveTask?: (id: string) => void
 }
 
+type ErrorBlock<T> = {
+    isShowing: boolean
+    error: T
+}
+
 function App() {
     const inputTaskRef = useRef<HTMLInputElement>(null)
+    const [errorShow, setErrorShow] = useState<ErrorBlock<Error>>({
+        isShowing: false,
+        error: { message: "", name: "" },
+    })
     const [allTasks, setAllTasks] = useState<Task[]>([])
     const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+
+    const doShowError = (error: Error) => {
+        setErrorShow({
+            isShowing: true,
+            error: { message: error.message, name: error.name },
+        })
+
+        setTimeout(
+            () =>
+                setErrorShow({
+                    isShowing: false,
+                    error: { message: "", name: "" },
+                }),
+            2000
+        )
+
+        return <ErrorBlock error={error} />
+    }
 
     const doAddNewTask = useCallback(async () => {
         const taskName = inputTaskRef.current!.value
         const taskId = v4()
         const addNewTaskOptions = {
-            headers: { "Content-Type": "application/json" },
             data: {
                 taskName,
                 taskId,
@@ -29,6 +56,7 @@ function App() {
 
         if (taskName.trim().length > 0) {
             inputTaskRef.current!.value = ""
+
             try {
                 await axios
                     .post("http://localhost:3000/add-task", addNewTaskOptions)
@@ -36,7 +64,7 @@ function App() {
                         setAllTasks([{ taskName, taskId }, ...allTasks])
                     )
             } catch (error) {
-                console.log(error)
+                if (error instanceof Error) doShowError(error)
             }
         }
     }, [allTasks])
@@ -64,23 +92,28 @@ function App() {
                     axios
                         .post("http://localhost:3000/tasks", getTasksOptions)
                         .then((res) => setAllTasks(res.data.tasks))
-                        .catch((e) => console.log(e))
+                        .catch((error) =>
+                            error instanceof Error ? doShowError(error) : ""
+                        )
                 )
         } catch (error) {
-            console.log(error)
+            if (error instanceof Error) doShowError(error)
         }
     }, [])
 
     useEffect(() => {
-        axios
-            .get("http://localhost:3000/auth/users")
-            .then((res) => setAllTasks(res.data.users.tasks))
-            .catch((e) => console.log(e))
+        try {
+            axios
+                .get("http://localhost:3000/auth/users")
+                .then(({ data }) => setAllTasks(data.users.tasks))
+        } catch (error) {
+            if (error instanceof Error) doShowError(error)
+        }
     }, [])
 
     return (
         <main className={styles["todo-window"]}>
-            <h1>Tasks: {allTasks.length}</h1>
+            <h1 className={styles["heading"]}>Tasks: {allTasks.length}</h1>
             <div className={styles["input-section"]}>
                 <input
                     className={styles["input-task"]}
@@ -95,7 +128,6 @@ function App() {
                     onClick={doAddNewTask}
                     style={{
                         opacity: isInputFocused ? 1 : 0,
-                        transitionDelay: ".2s",
                     }}
                 >
                     Done
@@ -110,6 +142,8 @@ function App() {
                     />
                 ))}
             </div>
+
+            {errorShow.isShowing ? <ErrorBlock error={errorShow.error} /> : ""}
         </main>
     )
 }
