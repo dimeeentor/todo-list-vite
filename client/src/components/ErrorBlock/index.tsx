@@ -1,20 +1,12 @@
 import { FC } from "react"
 import styles from "./styles.module.css"
 
-type ErrorBlockProps = {
-    error: Error
+type ErrorBlock = {
+    message: string
 }
 
-const ErrorBlock: FC<ErrorBlockProps> = ({ error }) => {
-    switch (error.message) {
-        case "Network Error":
-            error.message = "Cannot connect to the server."
-            break
-        default:
-            return error.message
-    }
-
-    return <div className={styles["error"]}>{error.message}</div>
+const ErrorBlock: FC<ErrorBlock> = ({ message }) => {
+    return <div className={styles["error"]}>{message}</div>
 }
 
 export default ErrorBlock

@@ -1,6 +1,8 @@
 .error {
+  font-size: var(--font-size-md);
   position: absolute;
-  bottom: 15px;
+  top: 15px;
+  right: 15px;
   padding: 6px 12px;
   border: 1px solid #313131;
   border-radius: 6px;
@@ -11,6 +13,36 @@
   .error {
     border: 1px solid #939393;
     color: white;
-    background-color: #131313;
+    background-color: #212121;
+    animation: notification 2s ease-in-out;
+  }
+}
+
+@keyframes notification {
+  0% {
+    opacity: 0;
+  }
+
+  25% {
+    background-color: #212121;
+    opacity: 1;
+  }
+
+  50% {
+    background-color: #414141;
+  }
+
+  75% {
+    background-color: #212121;
+  }
+
+  90% {
+    background-color: #414141;
+    opacity: 1;
+  }
+
+  100% {
+    background-color: #212121;
+    opacity: 0;
   }
 }

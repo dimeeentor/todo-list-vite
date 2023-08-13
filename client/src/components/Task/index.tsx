@@ -1,4 +1,4 @@
-import axios from "axios"
+import api from "../../api"
 import { TaskProps } from "../../App"
 import styles from "./styles.module.css"
 import { FC, KeyboardEvent, useCallback, useRef, useState } from "react"
@@ -18,29 +18,13 @@ const TaskElement: FC<TaskProps> = ({
             const task = taskNameRef.current!
 
             if (isTaskEditing && inputEdit.value !== "") {
-                const updateTaskOptions = {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    data: {
-                        newTaskName,
-                        taskId,
-                        id: "64d370637f22285ea15be35a",
-                    },
-                }
-
-                try {
-                    const { data } = await axios.post(
-                        "http://localhost:3000/update-task",
-                        updateTaskOptions
-                    )
-
-                    task.textContent = data.newTaskName as string
-                    inputEdit.value = ""
-                    inputEdit.placeholder = task.textContent
-                } catch (error) {
-                    console.log(error)
-                }
+                await api
+                    .updateTask(newTaskName, taskId, "64d370637f22285ea15be35a")
+                    .then(({ data: { newTaskName } }) => {
+                        task.textContent = newTaskName
+                        inputEdit.value = ""
+                        inputEdit.placeholder = task.textContent
+                    })
             }
         },
         [isTaskEditing]

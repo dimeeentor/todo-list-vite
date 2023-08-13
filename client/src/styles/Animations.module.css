@@ -1,7 +1,0 @@
-.remove-task {
-  opacity: 0;
-  height: 0;
-  margin: 0;
-  padding: 0;
-  transition: .3s ease;
-}

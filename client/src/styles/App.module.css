@@ -31,7 +31,6 @@ button {
 
 .todo-window {
   display: flex;
-  position: relative;
   flex-direction: column;
   align-items: center;
   width: 50dvw;

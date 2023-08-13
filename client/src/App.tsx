@@ -1,115 +1,65 @@
+import api from "./api"
 import { v4 } from "uuid"
 import { Task } from "./types/Task"
 import TaskElement from "./components/Task"
 import styles from "./styles/App.module.css"
-import axios, { AxiosRequestConfig } from "axios"
-import { useState, useRef, useCallback, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import ErrorBlock from "./components/ErrorBlock"
+import { Notification } from "./types/Notification"
+import { useState, useRef, useCallback, useEffect } from "react"
 
 export type TaskProps = {
     task: Task
     doRemoveTask?: (id: string) => void
 }
 
-type ErrorBlock<T> = {
-    isShowing: boolean
-    error: T
-}
-
 function App() {
     const inputTaskRef = useRef<HTMLInputElement>(null)
-    const [errorShow, setErrorShow] = useState<ErrorBlock<Error>>({
-        isShowing: false,
-        error: { message: "", name: "" },
+    const [errorNotication, setErrorNotification] = useState<Notification>({
+        message: "",
     })
     const [allTasks, setAllTasks] = useState<Task[]>([])
     const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
 
-    const doShowError = (error: Error) => {
-        setErrorShow({
-            isShowing: true,
-            error: { message: error.message, name: error.name },
-        })
+    const navigate = useNavigate()
 
-        setTimeout(
-            () =>
-                setErrorShow({
-                    isShowing: false,
-                    error: { message: "", name: "" },
-                }),
-            2000
-        )
-
-        return <ErrorBlock error={error} />
+    const doShowError = ({ message }: Notification) => {
+        setErrorNotification({ message })
+        setTimeout(() => setErrorNotification({ message: "" }), 2000)
     }
 
     const doAddNewTask = useCallback(async () => {
         const taskName = inputTaskRef.current!.value
         const taskId = v4()
-        const addNewTaskOptions = {
-            data: {
-                taskName,
-                taskId,
-                id: "64d370637f22285ea15be35a",
-            },
-        }
 
         if (taskName.trim().length > 0) {
             inputTaskRef.current!.value = ""
-
-            try {
-                await axios
-                    .post("http://localhost:3000/add-task", addNewTaskOptions)
-                    .then(({ data: { taskName, taskId } }) =>
-                        setAllTasks([{ taskName, taskId }, ...allTasks])
-                    )
-            } catch (error) {
-                if (error instanceof Error) doShowError(error)
-            }
+            await api
+                .addTask(taskName, taskId, "64d370637f22285ea15be35a")
+                .then(({ data: { taskName, taskId } }) => {
+                    setAllTasks([{ taskName, taskId }, ...allTasks])
+                })
+                .catch((error) => doShowError(error))
         }
     }, [allTasks])
 
     const doRemoveTask = useCallback(async (taskId: string) => {
-        const deleteTaskOptions: AxiosRequestConfig = {
-            headers: { "Content-Type": "application/json" },
-            data: {
-                taskId,
-                id: "64d370637f22285ea15be35a",
-            },
-        }
-
-        const getTasksOptions: AxiosRequestConfig = {
-            headers: { "Content-Type": "application/json" },
-            data: {
-                id: "64d370637f22285ea15be35a",
-            },
-        }
-
-        try {
-            await axios
-                .post("http://localhost:3000/delete-task", deleteTaskOptions)
-                .then(() =>
-                    axios
-                        .post("http://localhost:3000/tasks", getTasksOptions)
-                        .then((res) => setAllTasks(res.data.tasks))
-                        .catch((error) =>
-                            error instanceof Error ? doShowError(error) : ""
-                        )
-                )
-        } catch (error) {
-            if (error instanceof Error) doShowError(error)
-        }
+        await api
+            .deleteTask(taskId, "64d370637f22285ea15be35a")
+            .then(({ data }) => doShowError(data))
+            .then(() =>
+                api
+                    .getTasks("64d370637f22285ea15be35a")
+                    .then(({ data: { tasks } }) => setAllTasks(tasks))
+            )
+            .catch((error) => doShowError(error))
     }, [])
 
     useEffect(() => {
-        try {
-            axios
-                .get("http://localhost:3000/auth/users")
-                .then(({ data }) => setAllTasks(data.users.tasks))
-        } catch (error) {
-            if (error instanceof Error) doShowError(error)
-        }
-    }, [])
+        api.getTasks("64d370637f22285ea15be35a")
+            .then(({ data: { tasks } }) => setAllTasks(tasks))
+            .catch((error: Notification) => doShowError(error))
+    }, [navigate])
 
     return (
         <main className={styles["todo-window"]}>
@@ -142,8 +92,11 @@ function App() {
                     />
                 ))}
             </div>
-
-            {errorShow.isShowing ? <ErrorBlock error={errorShow.error} /> : ""}
+            {errorNotication.message ? (
+                <ErrorBlock message={errorNotication.message} />
+            ) : (
+                ""
+            )}
         </main>
     )
 }
